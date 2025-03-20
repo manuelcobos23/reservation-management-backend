@@ -1,0 +1,7 @@
+README.md
+pom.xml
+src/main/java/com/bookandgo/reservation/infra/api/dto/ApplicablePriceDTO.java
+src/main/java/com/bookandgo/reservation/infra/api/dto/ErrorDTO.java
+src/main/java/com/bookandgo/reservation/infra/api/dto/ErrorListDTO.java
+src/main/java/com/bookandgo/reservation/infra/api/rest/controllers/ApiUtil.java
+src/main/java/com/bookandgo/reservation/infra/api/rest/controllers/PricesApi.java

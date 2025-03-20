@@ -1,0 +1,241 @@
+openapi: 3.0.0  
+info:
+  title: Example Test 2022
+  description: API to manage prices list
+  version: 1.0.0
+  contact:
+    name: "Juan Bueno"
+    email: "${author}@axpe.com"
+servers:
+  - url: '{protocol}://{host}:{port}/{basePath}'
+    variables:
+      protocol:
+        default: 'http'
+      host:
+        default: 'localhost'
+      port:
+        default: '8080'
+      basePath:
+        default: ${artifactId}
+security:
+  - basicAuth: []
+
+  
+paths:
+  '/prices/{brandId}/priceList/{productId}':
+    get:
+      tags:
+        - Applicable Prices
+      operationId: getApplicablePricesByProduct
+      summary: "Allows to get the applicabe price list for a concrete product"
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/X-B3-TraceId'
+        - $ref: '#/components/parameters/X-B3-SpanId'
+        - $ref: '#/components/parameters/X-B3-ParentSpanId'
+        - $ref: '#/components/parameters/X-B3-Sampled'
+        - $ref: '#/components/parameters/brandId'
+        - $ref: '#/components/parameters/productId'
+        - in: query
+          name: date
+          required: true
+          description: Date to get applicable price
+          schema:
+            $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicablePrice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+      security:
+        - basicAuth: []
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  responses:
+    NonContent:
+      description: "Non content"
+    BadRequest:
+      description: "Bad request"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    NotFound:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    Unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    NotAcceptable:
+      description: "NotAcceptable"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    UnsupportedMediaType:
+      description: "Unsupported Media Type"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    ServiceUnavailable:
+      description: "Service unavailable"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    GatewayTimeout:
+      description: "Too Many Requests"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+
+  parameters:
+    Authorization:
+      in: header
+      name: Authorization
+      required: true
+      schema:
+        type: string
+      description: "Authorization security header"
+      example: Basic YWRtaW46YWRtaW4=
+    X-B3-TraceId:
+      in: header
+      name: X-B3-TraceId
+      required: false
+      schema:
+        type: string
+      description: "Overall ID of the trace, shared by every span in the trace. \n\nThe value is 64 or 128 bits long"
+      example: 80f198ee56343ba864fe8b2a57d3eff7
+    X-B3-ParentSpanId:
+      in: header
+      name: X-B3-ParentSpanId
+      required: false
+      schema:
+        type: string
+      description: "Position of the parent operation in the trace tree.\n\nThe value is 64 bits long. \n\nThe value is omitted when the span is the root of the trace tree"
+      example: 05e3ac9a4f6e3b90
+    X-B3-SpanId:
+      in: header
+      name: X-B3-SpanId
+      required: false
+      schema:
+        type: string
+      description: "Position of the current operation in the trace tree.\n\nThe value is 64 bits long.\n\nDo not interpret the value: it may or may not be derived from the value of the TraceId."
+      example: e457b5a2e4d86bd1
+    X-B3-Sampled:
+      in: header
+      name: X-B3-Sampled
+      required: false
+      schema:
+        type: string
+      description: "Sampling decision.\n\nSampling is a mechanism to reduce the volume of data in the tracing system. In B3, sampling applies consistently per-trace: once the sampling decision is made, the same value must be consistently sent downstream. This means that either all or no spans share a trace ID.\n\nThe possible values are: \n- 0 = Deny\n- 1 = Accept\n- d = Debug"
+      example: 1
+    brandId:
+      in: path
+      name: brandId
+      required: true
+      schema:
+        type: integer
+      description: "Brand Id"
+      example: 1
+    productId:
+      in: path
+      name: productId
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: "Product Id"
+      example: 35455
+      
+  schemas:
+    ApplicablePrice:
+      type: object
+      description: "Data structure containing the applicable price for a concrete date"
+      properties:
+        productId:
+          type: integer
+          format: int64
+        brandId:
+          type: integer
+          format: int64
+        priceList:
+          type: integer
+          format: int32
+        startDate:
+          $ref: '#/components/schemas/Date'
+        endDate:
+          $ref: '#/components/schemas/Date'
+        price:
+          type: number
+          format: float
+      example:
+        productId: 35455
+        brandId: 1
+        priceList: 2
+        date: "2020-07-16T16:55:42.000Z"
+        price: 35.50
+    Date: 
+      type: string
+      format: date-time
+      description: Creation date and time
+      example: "2020-07-16T16:55:42.000Z"
+    ErrorList:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Unique alphanumeric human readable error code
+          example: "Error code"
+        message:
+          type: string
+          description: Brief summary of issue reported
+          example: "Error description"
+        level:
+          type: string
+          description: 'Different issue level: info, warning, error'
+          example: "ErrorLevel error"
